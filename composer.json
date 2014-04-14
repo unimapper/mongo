@@ -1,0 +1,20 @@
+{
+    "name": "bauer01/unimapper-mongo",
+    "type": "library",
+    "description": "MongoDB implementation for UniMapper",
+    "keywords": ["php", "mapping", "data", "orm", "database", "mongodb", "nosql"],
+    "license": ["MIT"],
+    "authors": [
+        {
+            "name": "Bronislav Sedlak",
+            "homepage": "http://github.com/bauer01"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "ext-mongo": "*"
+    },
+    "autoload": {
+            "classmap": ["src/"]
+    }
+}
