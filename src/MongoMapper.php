@@ -3,7 +3,7 @@
 namespace UniMapper\Mapper;
 
 use UniMapper\Query,
-    UniMapper\Exception\MapperException;
+    UniMapper\Exceptions\MapperException;
 
 class MongoMapper extends \UniMapper\Mapper
 {
@@ -12,12 +12,12 @@ class MongoMapper extends \UniMapper\Mapper
     private $database;
 
     private $defaultConfig = [
-        host => "localhost",
-        port => "27017",
-        username => null,
-        password => null,
-        database => null,
-        options => []
+        "host" => "localhost",
+        "port" => 27017,
+        "username" => null,
+        "password" => null,
+        "database" => null,
+        "options" => []
     ];
 
     public function __construct(array $config, $name)
@@ -63,7 +63,22 @@ class MongoMapper extends \UniMapper\Mapper
 
     public function findAll(Query\FindAll $query)
     {
-        throw new MapperException("Not implemented!");
+        $collectionName = $this->getResource($query->entityReflection);
+
+        $collection = $this->database->{$collectionName};
+        if (!$collection) {
+            throw new MapperException("Collection with name " . $collectionName . " not found!");
+        }
+
+        $selection = array_fill_keys($this->getSelection($query->entityReflection), true);
+
+        // @todo conditions, offset http://us2.php.net/manual/en/mongocollection.find.php
+        $result = $collection->find(array(), $selection)->limit($query->limit);
+        if (!$result) {
+            return false;
+        }
+
+        return $this->mapCollection($query->entityReflection->getClassName(), $result);
     }
 
     public function count(Query\Count $query)
