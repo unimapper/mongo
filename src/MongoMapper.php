@@ -88,7 +88,26 @@ class MongoMapper extends \UniMapper\Mapper
 
     public function insert(Query\Insert $query)
     {
-        throw new MapperException("Not implemented!");
+        $values = $this->unmapEntity($query->entity);
+        if (empty($values)) {
+            throw new MapperException("Entity has no mapped values!");
+        }
+
+        $collectionName = $this->getResource($query->entityReflection);
+
+        $collection = $this->database->{$collectionName};
+        if (!$collection) {
+            throw new MapperException("Collection with name " . $collectionName . " not found!");
+        }
+
+        $result = $collection->insert($values);
+        if ($result["err"] !== null) {
+            throw new MapperException($result["err"]);
+        }
+
+        if ($query->returnPrimaryValue) {
+            return $values[$query->entityReflection->getPrimaryProperty()->getName()];
+        }
     }
 
     public function update(Query\Update $query)
