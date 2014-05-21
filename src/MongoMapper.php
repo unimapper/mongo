@@ -86,18 +86,19 @@ class MongoMapper extends \UniMapper\Mapper
         throw new MapperException("Not implemented!");
     }
 
-    public function insert(Query\Insert $query)
+    /**
+     * Insert should return primary value
+     *
+     * @param string $resource
+     * @param array  $values
+     *
+     * @return mixed Primary value
+     */
+    public function insert($resource, array $values)
     {
-        $values = $this->unmapEntity($query->entity);
-        if (empty($values)) {
-            throw new MapperException("Entity has no mapped values!");
-        }
-
-        $collectionName = $this->getResource($query->entityReflection);
-
-        $collection = $this->database->{$collectionName};
+        $collection = $this->database->{$resource};
         if (!$collection) {
-            throw new MapperException("Collection with name " . $collectionName . " not found!");
+            throw new MapperException("Collection with name " . $resource . " not found!");
         }
 
         $result = $collection->insert($values);
@@ -105,12 +106,17 @@ class MongoMapper extends \UniMapper\Mapper
             throw new MapperException($result["err"]);
         }
 
-        if ($query->returnPrimaryValue) {
-            return $values[$query->entityReflection->getPrimaryProperty()->getName()];
-        }
+        return $values["_id"];
     }
 
-    public function update(Query\Update $query)
+    /**
+     * Update data by set of conditions
+     *
+     * @param string $resource
+     * @param array  $values
+     * @param array  $conditions
+     */
+    public function update($resource, array $values, array $conditions)
     {
         throw new MapperException("Not implemented!");
     }
