@@ -51,7 +51,13 @@ class MongoMapper extends \UniMapper\Mapper
         throw new MapperException("Not implemented!");
     }
 
-    public function delete(Query\Delete $query)
+    /**
+     * Delete record by some conditions
+     *
+     * @param string $resource
+     * @param array  $conditions
+     */
+    public function delete($resource, array $conditions)
     {
         throw new MapperException("Not implemented!");
     }
