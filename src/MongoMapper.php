@@ -106,7 +106,7 @@ class MongoMapper extends \UniMapper\Mapper
             throw new MapperException($result["err"]);
         }
 
-        return $values["_id"];
+        return (string) $values["_id"];
     }
 
     /**
