@@ -80,7 +80,7 @@ class Adapter extends \UniMapper\Adapter
             return false;
         }
 
-        return $result;
+        return iterator_to_array($result);
     }
 
     public function count($resource, $conditions)
