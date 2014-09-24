@@ -21,7 +21,7 @@ class Adapter extends \UniMapper\Adapter
 
     public function __construct($name, array $config = [])
     {
-        parent::__construct($name, new \UniMapper\Mapping);
+        parent::__construct($name, new Mapping);
 
         if ($config["database"] === null) {
             throw new AdapterException("No database selected!");
@@ -70,11 +70,10 @@ class Adapter extends \UniMapper\Adapter
             );
         }
 
-        // @todo conditions, offset http://us2.php.net/manual/en/mongocollection.find.php
         $result = $collection->find(
-            [],
+            $conditions,
             array_fill_keys($selection, true)
-        )->limit($limit);
+        )->limit($limit)->skip($offset);
 
         if (!$result) {
             return false;
