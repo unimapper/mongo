@@ -2,7 +2,8 @@
 
 namespace UniMapper\Mongo;
 
-use UniMapper\Exceptions\AdapterException;
+use UniMapper\Exceptions\AdapterException,
+    UniMapper\Association\ManyToMany;
 
 class Adapter extends \UniMapper\Adapter
 {
@@ -21,7 +22,7 @@ class Adapter extends \UniMapper\Adapter
 
     public function __construct($name, array $config = [])
     {
-        parent::__construct($name, new Mapping);
+        parent::__construct($name, new \UniMapper\Mapping);
 
         if ($config["database"] === null) {
             throw new AdapterException("No database selected!");
@@ -49,68 +50,67 @@ class Adapter extends \UniMapper\Adapter
         return new \MongoClient($url, $config["options"]);
     }
 
-    public function delete($resource, $conditions)
+    public function createDelete($resource)
     {
         throw new AdapterException("Not implemented!");
     }
 
-    public function findOne($resource, $primaryName, $primaryValue,
-        array $associations = [])
+    public function createFindOne($resource, $primaryName, $primaryValue)
     {
         throw new AdapterException("Not implemented!");
     }
 
-    public function find($resource, $selection = null, $conditions = null,
-        $orderBy = null, $limit = 0, $offset = 0, array $associations = [])
+    public function createFind($resource, array $selection = [], array $orderBy = [], $limit = 0, $offset = 0)
     {
-        $collection = $this->database->{$resource};
-        if (!$collection) {
-            throw new AdapterException(
-                "Collection with name " . $resource . " not found!"
-            );
+        $query = new Query($resource, "find");
+
+        if ($selection) {
+            $query->options["projection"] = array_fill_keys($selection, true);
         }
 
-        $result = $collection->find(
-            $conditions,
-            array_fill_keys($selection, true)
-        )->limit($limit)->skip($offset);
+        $query->callback = function ($result) {
+            return $result["retval"];
+        };
 
-        if (!$result) {
-            return false;
-        }
-
-        return iterator_to_array($result);
+        $query->after = ".toArray()";
+        return $query;
     }
 
-    public function count($resource, $conditions)
+    public function createCount($resource)
     {
         throw new AdapterException("Not implemented!");
     }
 
-    public function insert($resource, array $values)
-    {
-        $collection = $this->database->{$resource};
-        if (!$collection) {
-            throw new AdapterException("Collection with name " . $resource . " not found!");
-        }
-
-        $result = $collection->insert($values);
-        if ($result["err"] !== null) {
-            throw new AdapterException($result["err"]);
-        }
-
-        return $values["_id"];
-    }
-
-    public function update($resource, array $values, $conditions = null)
+    public function createInsert($resource, array $values)
     {
         throw new AdapterException("Not implemented!");
     }
 
-    public function updateOne($resource, $primaryName, $primaryValue,
-        array $values
-    ) {
+    public function createUpdate($resource, array $values)
+    {
         throw new AdapterException("Not implemented!");
+    }
+
+    public function createUpdateOne($resource, $name, $value, array $values)
+    {
+        throw new AdapterException("Not implemented!");
+    }
+
+    public function createModifyManyToMany(ManyToMany $association, $primaryValue, array $keys, $action = self::ASSOC_ADD)
+    {
+        throw new AdapterException("Not implemented!");
+    }
+
+    public function execute(\UniMapper\Adapter\IQuery $query)
+    {
+        $result = $this->database->execute($query->getRaw());
+
+        $callback = $query->callback;
+        if ($callback) {
+            return $callback($result);
+        }
+
+        return $result;
     }
 
 }

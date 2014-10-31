@@ -17,7 +17,7 @@ before_script:
   - composer update --no-interaction --dev
 
 script:
-    - ./vendor/nette/tester/Tester/tester tests/
+    #- ./vendor/nette/tester/Tester/tester tests/
     - ./vendor/squizlabs/php_codesniffer/scripts/phpcs ./src --standard=codestyle.xml -n
 
 git:
