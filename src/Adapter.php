@@ -5,7 +5,7 @@ namespace UniMapper\Mongo;
 use UniMapper\Exceptions\AdapterException,
     UniMapper\Association\ManyToMany;
 
-class Adapter extends \UniMapper\Adapter
+class Adapter implements \UniMapper\Adapter\IAdapter
 {
 
     /** @var \MongoDB */
@@ -20,10 +20,11 @@ class Adapter extends \UniMapper\Adapter
         "options" => []
     ];
 
-    public function __construct($name, array $config = [])
-    {
-        parent::__construct($name, new \UniMapper\Mapping);
+    /** @var \UniMapper\Mapping */
+    private $mapping;
 
+    public function __construct(array $config = [])
+    {
         if ($config["database"] === null) {
             throw new AdapterException("No database selected!");
         }
@@ -31,6 +32,8 @@ class Adapter extends \UniMapper\Adapter
         $this->database = $this->_createConnection(
             $this->defaultConfig + $config
         )->selectDB($config["database"]);
+
+        $this->mapping = new \UniMapper\Mapping;
     }
 
     private function _createConnection($config)
