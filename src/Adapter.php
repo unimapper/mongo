@@ -20,7 +20,7 @@ class Adapter implements \UniMapper\Adapter\IAdapter
         "options" => []
     ];
 
-    /** @var \UniMapper\Mapper */
+    /** @var \UniMapper\Adapter\Mapper */
     private $mapper;
 
     public function __construct(array $config = [])
@@ -33,7 +33,7 @@ class Adapter implements \UniMapper\Adapter\IAdapter
             $this->defaultConfig + $config
         )->selectDB($config["database"]);
 
-        $this->mapper = new \UniMapper\Mapper;
+        $this->mapper = new \UniMapper\Adapter\Mapper;
     }
 
     private function _createConnection($config)
