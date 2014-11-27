@@ -5,7 +5,7 @@ namespace UniMapper\Mongo;
 use UniMapper\Exceptions\AdapterException,
     UniMapper\Association\ManyToMany;
 
-class Adapter implements \UniMapper\Adapter\IAdapter
+class Adapter extends \UniMapper\Adapter
 {
 
     /** @var \MongoDB */
@@ -20,9 +20,6 @@ class Adapter implements \UniMapper\Adapter\IAdapter
         "options" => []
     ];
 
-    /** @var \UniMapper\Adapter\Mapper */
-    private $mapper;
-
     public function __construct(array $config = [])
     {
         if ($config["database"] === null) {
@@ -32,8 +29,6 @@ class Adapter implements \UniMapper\Adapter\IAdapter
         $this->database = $this->_createConnection(
             $this->defaultConfig + $config
         )->selectDB($config["database"]);
-
-        $this->mapper = new \UniMapper\Adapter\Mapper;
     }
 
     private function _createConnection($config)
@@ -58,12 +53,12 @@ class Adapter implements \UniMapper\Adapter\IAdapter
         throw new AdapterException("Not implemented!");
     }
 
-    public function createFindOne($resource, $primaryName, $primaryValue)
+    public function createSelectOne($resource, $primaryName, $primaryValue)
     {
         throw new AdapterException("Not implemented!");
     }
 
-    public function createFind($resource, array $selection = [], array $orderBy = [], $limit = 0, $offset = 0)
+    public function createSelect($resource, array $selection = [], array $orderBy = [], $limit = 0, $offset = 0)
     {
         $query = new Query($resource, "find");
 
@@ -104,7 +99,7 @@ class Adapter implements \UniMapper\Adapter\IAdapter
         throw new AdapterException("Not implemented!");
     }
 
-    public function execute(\UniMapper\Adapter\IQuery $query)
+    public function onExecute(\UniMapper\Adapter\IQuery $query)
     {
         $result = $this->database->execute($query->getRaw());
 
@@ -114,11 +109,6 @@ class Adapter implements \UniMapper\Adapter\IAdapter
         }
 
         return $result;
-    }
-
-    public function getMapper()
-    {
-        return $this->mapper;
     }
 
 }
