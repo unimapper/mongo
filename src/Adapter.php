@@ -3,7 +3,7 @@
 namespace UniMapper\Mongo;
 
 use UniMapper\Exceptions\AdapterException,
-    UniMapper\Association\ManyToMany;
+    UniMapper\Reflection\Association\ManyToMany;
 
 class Adapter extends \UniMapper\Adapter
 {
